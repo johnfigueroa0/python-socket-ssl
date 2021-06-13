@@ -16,14 +16,14 @@ ssl_version = None
 certfile = "./ssl/certificate.pem"
 keyfile = "./ssl/key.pem"
 ciphers = None
-option_test_switch = 0 # to test, change to 1
+option_test_switch = 1 # to test, change to 1
 
 version_dict = {
     "tlsv1.0" : ssl.PROTOCOL_TLSv1,
     "tlsv1.1" : ssl.PROTOCOL_TLSv1_1,
     "tlsv1.2" : ssl.PROTOCOL_TLSv1_2,
     "sslv23"  : ssl.PROTOCOL_SSLv23,
-    "sslv3"   : ssl.PROTOCOL_SSLv3,
+#    "sslv3"   : ssl.PROTOCOL_SSLv3,
 }
 
 
@@ -46,8 +46,8 @@ for i in range(1, len(sys.argv)):
         FILE = arg
 
 if option_test_switch == 1:
-    print "ver=", ssl_version, "ciphers=",ciphers, "certfile=", certfile, \
-            "keyfile=", keyfile, "HOST=", HOST, "PORT=", PORT, "FILE=", FILE
+    print("ver=", ssl_version, "ciphers=",ciphers, "certfile=", certfile, \
+            "keyfile=", keyfile, "HOST=", HOST, "PORT=", PORT, "FILE=", FILE)
 
 ##########################################################
 # Init and configure SSLContext, then Wrap socket
@@ -65,7 +65,7 @@ def ssl_wrap_socket(sock, ssl_version=None, keyfile=None, certfile=None, ciphers
         #create a new SSL context with specified TLS version
         sslContext = ssl.SSLContext(version_dict[ssl_version])
         if option_test_switch == 1:
-            print "ssl_version loaded!! =", ssl_version
+            print("ssl_version loaded!! =", ssl_version)
     else:
         #if not specified, default
         sslContext = ssl.create_default_context(ssl.Purpose.CLIENT_AUTH)
@@ -74,17 +74,17 @@ def ssl_wrap_socket(sock, ssl_version=None, keyfile=None, certfile=None, ciphers
         #if specified, set certain ciphersuite
         sslContext.set_ciphers(ciphers)
         if option_test_switch == 1:
-            print "ciphers loaded!! =", ciphers
+            print("ciphers loaded!! =", ciphers)
     
     #server-side must load certfile and keyfile, so no if-else
     sslContext.load_cert_chain(certfile, keyfile)
-    print "ssl loaded!! certfile=", certfile, "keyfile=", keyfile
+    print("ssl loaded!! certfile=", certfile, "keyfile=", keyfile)
     
     try:
         return sslContext.wrap_socket(sock, server_side = True)
     except ssl.SSLError as e:
-        print "wrap socket failed!"
-        print traceback.format_exc()
+        print("wrap socket failed!")
+        print(traceback.format_exc())
 
 
 #4. Prepare a sever socket 
@@ -98,7 +98,7 @@ serverSocket.listen(10)
 #######################################################
 while True:
     #Establish the connection
-    print 'Ready to serve...' 
+    print('Ready to serve...') 
     newSocket, addr = serverSocket.accept()
     connectionSocket = ssl_wrap_socket(newSocket, ssl_version, keyfile, certfile, ciphers)
     if not connectionSocket:
@@ -106,9 +106,9 @@ while True:
     
     try:
       message = connectionSocket.recv(1024)
-      print "message=", message
+      print("message=", message)
       filename = message.split()[1] 
-      print "filename=", filename
+      print("filename=", filename)
       f = open(filename[1:])  
       outputdata = f.read() 
       f.close()
